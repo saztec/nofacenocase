@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NoFaceNoCase — Demo Study Notes</title>
+<style>
+  :root { --green:#1F5D3A; --deep:#143E27; --moss:#6BA368; --soft:#E7F0E5; --ink:#22271f; --mute:#5c6b60; --gold:#9A7B1F; --line:#dfe4dc; }
+  * { box-sizing: border-box; -webkit-text-size-adjust: 100%; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:#f4f6f2; color:var(--ink); line-height:1.6; font-size:18px; }
+  .wrap { max-width:760px; margin:0 auto; padding:0 16px 80px; }
+  header { background:var(--deep); color:#fff; padding:30px 20px 26px; text-align:center; }
+  header h1 { margin:0 0 6px; font-size:27px; }
+  header p { margin:0; color:#cfe0cb; font-size:15px; }
+  h2 { color:var(--green); font-size:21px; margin:34px 0 12px; padding-bottom:6px; border-bottom:2px solid var(--soft); }
+  h3 { color:var(--green); font-size:18px; margin:20px 0 8px; }
+  p { margin:0 0 12px; }
+  .pill { display:inline-block; background:var(--soft); color:var(--green); font-weight:700; font-size:13px; padding:3px 11px; border-radius:20px; margin-bottom:10px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:12px 0; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+  .say { background:var(--soft); border-radius:12px; padding:12px 14px; margin:10px 0; font-style:italic; }
+  .say b { font-style:normal; color:var(--green); }
+  details { background:#fff; border:1px solid var(--line); border-radius:14px; margin:10px 0; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+  details summary { list-style:none; cursor:pointer; padding:15px 18px; font-weight:700; font-size:17px; color:var(--green); display:flex; justify-content:space-between; align-items:center; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"＋"; color:var(--moss); font-size:20px; font-weight:700; }
+  details[open] summary::after { content:"–"; }
+  details .body { padding:0 18px 16px; }
+  .analogy { background:#fff7e6; border-radius:10px; padding:10px 13px; margin:8px 0; font-size:16px; }
+  .analogy b { color:var(--gold); }
+  .num { font-size:26px; font-weight:800; color:var(--green); }
+  .grid { display:flex; flex-wrap:wrap; gap:10px; }
+  .stat { background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; flex:1 1 140px; text-align:center; }
+  .stat small { display:block; color:var(--mute); font-size:13px; margin-top:2px; }
+  ul { margin:0 0 12px; padding-left:22px; }
+  li { margin-bottom:7px; }
+  .tip { background:var(--deep); color:#fff; border-radius:14px; padding:14px 18px; margin:12px 0; }
+  .tip b { color:#f4d67a; }
+  code { background:#eef2ec; padding:1px 6px; border-radius:5px; font-size:15px; }
+  .toc a { color:var(--green); text-decoration:none; }
+  .toc li { margin-bottom:9px; font-weight:600; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NoFaceNoCase</h1>
+  <p>Demo study notes · plain-English edition</p>
+</header>
+<div class="wrap">
+
+<div class="card toc">
+  <span class="pill">START HERE</span>
+  <p>Tap any section to open it. Read the green “<b>Say this</b>” boxes out loud — that’s language you can reuse in your demo.</p>
+  <ul>
+    <li><a href="#pitch">1. The 30-second pitch</a></li>
+    <li><a href="#problem">2. The problem, in plain words</a></li>
+    <li><a href="#bigpicture">3. How it all fits together</a></li>
+    <li><a href="#services">4. Every AWS service, explained simply</a></li>
+    <li><a href="#star">5. The star: your own trained model</a></li>
+    <li><a href="#jargon">6. Jargon buster</a></li>
+    <li><a href="#numbers">7. Numbers to remember</a></li>
+    <li><a href="#qa">8. Questions they might ask</a></li>
+    <li><a href="#checklist">9. Demo-day checklist</a></li>
+  </ul>
+</div>
+
+<h2 id="pitch">1. The 30-second pitch</h2>
+<div class="card">
+<p>NoFaceNoCase is a <b>website for hospital staff</b> that helps them keep an eye on patients who might be in distress or at risk of falling.</p>
+<p>A nurse takes or uploads a photo of a patient during a check-in. The website uses <b>artificial intelligence</b> to read the patient’s <b>facial expression</b>, read the <b>mood of the nurse’s written note</b>, and check whether the patient is <b>actually in their bed</b>. If something looks wrong, it <b>automatically emails the doctor</b>.</p>
+<p>Everything runs on <b>Amazon Web Services (AWS)</b> — Amazon’s cloud computing platform.</p>
+</div>
+<div class="say"><b>Say this:</b> “NoFaceNoCase is a serverless patient-monitoring website built entirely on AWS. It uses image recognition to spot at-risk patients earlier than manual checks can.”</div>
+
+<h2 id="problem">2. The problem, in plain words</h2>
+<div class="card">
+<p>Hospital wards don’t have enough staff to watch every patient all the time. The patients who most need watching — confused, distressed, or likely to wander and fall — are exactly the ones who can quietly get worse between a nurse’s rounds.</p>
+<p>Two warning signs are easy for a busy nurse to miss:</p>
+<ul>
+  <li><b>How the patient feels</b> — fear or sadness they don’t say out loud.</li>
+  <li><b>Getting out of bed at night</b> — a big cause of falls and wandering.</li>
+</ul>
+<p>NoFaceNoCase gives staff an objective “second pair of eyes” for both.</p>
+</div>
+
+<h2 id="bigpicture">3. How it all fits together</h2>
+<div class="card">
+<div class="analogy"><b>Think of a restaurant:</b> you (the customer) never go into the kitchen. You talk to a waiter, who takes your order to the kitchen, and the kitchen uses the fridge, the chefs, and the suppliers to make your meal.</div>
+<p>The website works the same way:</p>
+<ul>
+  <li><b>You / the nurse</b> = the customer, using the web page.</li>
+  <li><b>API Gateway</b> = the waiter who takes requests.</li>
+  <li><b>Lambda</b> = the kitchen that does the actual work.</li>
+  <li><b>DynamoDB, S3, Rekognition, Comprehend, SNS</b> = the fridge, chefs and suppliers the kitchen uses.</li>
+</ul>
+<p>The nurse never touches those services directly — the “waiter and kitchen” handle it all behind the scenes.</p>
+</div>
+
+<h2 id="services">4. Every AWS service, explained simply</h2>
+<p style="color:var(--mute);font-size:15px;">Tap each one. Each has: what it is, an everyday analogy, how <i>your</i> app uses it, and a one-line answer if you’re asked.</p>
+
+<details><summary>Amazon S3 — storage</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> a giant, unlimited filing cabinet in the cloud.</div>
+<p><b>What it is:</b> a place to store files — images, and the website’s own pages.</p>
+<p><b>How you use it:</b> two “drawers” (called buckets). One holds your <b>website files</b>; the other holds the <b>patient photos</b>, locked so the public can’t see them and set to auto-delete after 30 days.</p>
+<div class="say"><b>If asked:</b> “S3 stores my website and the patient photos. The photo bucket is encrypted and blocked from public access.”</div>
+</div></details>
+
+<details><summary>AWS Lambda — the worker</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> a worker who only clocks in when there’s a job, does it, and clocks out — you only pay for the seconds they work.</div>
+<p><b>What it is:</b> code that runs on demand without you managing a server (“serverless”).</p>
+<p><b>How you use it:</b> one Lambda function is the “brain” that handles <b>every</b> action — saving a patient, running a photo through AI, sending an alert.</p>
+<div class="say"><b>If asked:</b> “All my logic lives in one Lambda function. It talks to every other AWS service using code.”</div>
+</div></details>
+
+<details><summary>Amazon API Gateway — the front door</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> the receptionist who checks your pass before letting your request through to the office.</div>
+<p><b>What it is:</b> the secure doorway between the website and the Lambda.</p>
+<p><b>How you use it:</b> the web page sends requests here; it checks the user is logged in, then passes them to Lambda.</p>
+<div class="say"><b>If asked:</b> “API Gateway is the secure entry point to my backend, and it checks the login token on every request.”</div>
+</div></details>
+
+<details><summary>Amazon DynamoDB — the database</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> a super-fast digital spreadsheet that never slows down.</div>
+<p><b>What it is:</b> where all the data is stored — patients, check-ins, medications.</p>
+<p><b>How you use it:</b> three tables. Your app can <b>Create, Read, Update and Delete</b> records (that’s “CRUD” — see jargon buster).</p>
+<div class="say"><b>If asked:</b> “Patient data lives in DynamoDB. I have full CRUD — I can add, view, edit and delete patients.”</div>
+</div></details>
+
+<details><summary>AWS Rekognition — the image AI (⭐ two parts)</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> a pair of trained eyes that can describe what’s in a photo.</div>
+<p><b>What it is:</b> Amazon’s image-recognition service. You use it in <b>two</b> ways:</p>
+<p><b>1. DetectFaces (ready-made):</b> Amazon already trained this. You hand it a face photo and it reports the emotion — happy, sad, fearful, etc.</p>
+<p><b>2. Custom Labels (you trained this yourself):</b> Amazon can’t tell if a hospital bed is occupied, so <b>you trained your own model</b> to do it. This is the impressive bit — see section 5.</p>
+<div class="say"><b>If asked:</b> “I use Rekognition two ways — a ready-made model for facial emotion, and a model I trained myself for bed occupancy.”</div>
+</div></details>
+
+<details><summary>Amazon Comprehend — the text AI</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> a reader who can tell if a sentence sounds positive, negative or neutral.</div>
+<p><b>What it is:</b> Amazon’s language service. It reads text and reports the <b>sentiment</b> (the mood).</p>
+<p><b>How you use it:</b> when a nurse types a note, Comprehend reads it and labels it Positive / Negative / Neutral / Mixed — a second signal alongside the face.</p>
+<div class="say"><b>If asked:</b> “Comprehend reads the clinical note and tells me its sentiment, complementing the facial emotion.”</div>
+</div></details>
+
+<details><summary>Amazon Cognito — the login system</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> the security guard who checks staff ID badges and knows who’s allowed where.</div>
+<p><b>What it is:</b> handles user accounts and logins.</p>
+<p><b>How you use it:</b> only logged-in staff can use the site. Staff are put into groups — <b>nurse</b> or <b>clinician</b> — and only clinicians are allowed to delete patient records.</p>
+<div class="say"><b>If asked:</b> “Cognito handles login, and its groups give me role-based access — only clinicians can delete records.”</div>
+</div></details>
+
+<details><summary>Amazon SNS — the alert sender</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> an automatic pager that texts the doctor when something’s wrong.</div>
+<p><b>What it is:</b> a notification service that sends messages (here, emails).</p>
+<p><b>How you use it:</b> when a patient looks very distressed, or keeps leaving their bed, SNS <b>emails the assigned doctor</b> automatically.</p>
+<div class="say"><b>If asked:</b> “SNS sends the distress and wandering alerts by email to the clinician.”</div>
+</div></details>
+
+<details><summary>Amazon CloudFront — the fast, secure delivery</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> local pickup points so everyone gets the website quickly — and it arrives sealed (secure).</div>
+<p><b>What it is:</b> delivers your website fast and over <b>HTTPS</b> (the secure, padlock version of a web address).</p>
+<p><b>How you use it:</b> it sits in front of your S3 website so the site loads over a secure <code>https://</code> link — the URL you demo with.</p>
+<div class="say"><b>If asked:</b> “CloudFront serves my site over HTTPS with a security certificate — that’s my live demo link.”</div>
+</div></details>
+
+<details><summary>AWS IAM — the permissions rulebook</summary><div class="body">
+<div class="analogy"><b>Analogy:</b> a keycard that only opens the exact doors you need — nothing more.</div>
+<p><b>What it is:</b> controls what each part of your system is allowed to touch.</p>
+<p><b>How you use it:</b> your Lambda is given <b>only</b> the permissions it needs, pointed at the exact resources (not “everything”). This is called <b>least privilege</b> and it’s good security.</p>
+<div class="say"><b>If asked:</b> “I used a least-privilege IAM role — the Lambda can only touch the specific resources it needs, no wildcards.”</div>
+</div></details>
+
+<h2 id="star">5. The star of the show: your own trained model</h2>
+<div class="card">
+<p>This is the part to be proud of, because <b>you built and trained it yourself</b> — not something Amazon handed you ready-made.</p>
+<h3>What you did, step by step</h3>
+<ul>
+  <li>You collected about <b>35 photos</b> — some of beds with a person in them, some of empty beds.</li>
+  <li>On the “occupied” photos you drew a <b>box around the person</b> (called a “bounding box”) and labelled it <code>occupant</code>.</li>
+  <li>You left the empty-bed photos <b>unlabelled</b> — that teaches the model what “nobody here” looks like.</li>
+  <li>AWS <b>trained</b> the model and gave you a score card. Then it can look at a <b>new</b> photo and say “occupied” or “empty”, and draw a box where it sees a person.</li>
+</ul>
+<h3>The problem you solved (great story to tell)</h3>
+<p>At first, a <b>messy but empty</b> bed got mistaken for “occupied” — the crumpled sheets looked like a body. You tried adding more messy-empty photos, but it still slipped through. So you looked at the confidence scores: a real person scored about <b>21%</b>, the false alarm about <b>13.6%</b>. You set the cut-off (called <code>MinConfidence</code>) to <b>17</b> — right between them. That fixed the false alarm while still catching real patients.</p>
+</div>
+<div class="say"><b>Say this:</b> “I trained a Custom Labels model on my own photos to detect bed occupancy. When a messy empty bed caused a false positive, I diagnosed it using the confidence scores and tuned the threshold to fix it — a real development and problem-solving process.”</div>
+
+<h2 id="numbers">6. Numbers to remember</h2>
+<div class="grid">
+  <div class="stat"><span class="num">0.78</span><small>F1 score (overall accuracy grade of your model)</small></div>
+  <div class="stat"><span class="num">1.00</span><small>Recall — it never missed a real occupied bed</small></div>
+  <div class="stat"><span class="num">~35</span><small>photos you trained it on</small></div>
+  <div class="stat"><span class="num">17</span><small>confidence cut-off you tuned it to</small></div>
+  <div class="stat"><span class="num">4</span><small>pages: login, registry, check-in, trends</small></div>
+  <div class="stat"><span class="num">3</span><small>DynamoDB tables: patients, check-ins, meds</small></div>
+</div>
+<p style="color:var(--mute);font-size:15px;margin-top:10px;">“F1” is just a single grade from 0 to 1 that balances two things: how often the model is right when it says “occupied”, and how often it catches real occupied beds. Higher is better.</p>
+
+<h2 id="jargon">6b. Jargon buster</h2>
+<details><summary>What does “serverless” mean?</summary><div class="body"><p>You didn’t rent or manage a computer that runs 24/7. Your code (Lambda) only runs when needed, and AWS handles the machines. Cheaper and less maintenance.</p></div></details>
+<details><summary>What is an “API”?</summary><div class="body"><p>A way for two pieces of software to talk. Your web page sends a request to the API, and the backend sends an answer back — like ordering through a menu.</p></div></details>
+<details><summary>What is “CRUD”?</summary><div class="body"><p>The four things you can do with data: <b>C</b>reate (add), <b>R</b>ead (view), <b>U</b>pdate (edit), <b>D</b>elete (remove). Your app does all four on patients.</p></div></details>
+<details><summary>What is “HTTPS” / the padlock?</summary><div class="body"><p>The secure version of a web address. Data is encrypted between the browser and the site so no one can snoop. CloudFront gives you this.</p></div></details>
+<details><summary>What is a “JWT” / login token?</summary><div class="body"><p>A digital wristband you get after logging in. Your browser shows it on every request to prove who you are. Cognito issues it; API Gateway checks it.</p></div></details>
+<details><summary>What is a “bounding box”?</summary><div class="body"><p>The rectangle drawn around an object the AI found in a photo — here, around the person in the bed. Your model returns its exact position.</p></div></details>
+<details><summary>What is “least privilege”?</summary><div class="body"><p>A security idea: give each part only the exact access it needs, nothing extra. Limits the damage if something is ever misused.</p></div></details>
+
+<h2 id="qa">7. Questions they might ask (with answers)</h2>
+<details><summary>“Why did you use DynamoDB instead of a normal database?”</summary><div class="body"><p>“It’s fast, fully managed, and fits a serverless app well — no database server to run. The spec allowed either RDS-MySQL or DynamoDB, and DynamoDB matched my architecture.”</p></div></details>
+<details><summary>“How is the facial emotion different from your bed model?”</summary><div class="body"><p>“Facial emotion uses DetectFaces — a model Amazon already trained. The bed model is Custom Labels — I trained it myself on my own photos, for a task Amazon’s service doesn’t cover.”</p></div></details>
+<details><summary>“How did you keep patient data secure?”</summary><div class="body"><p>“HTTPS everywhere via CloudFront, login through Cognito with nurse/clinician roles, a least-privilege IAM role, and the photo bucket is encrypted with public access blocked and 30-day auto-delete.”</p></div></details>
+<details><summary>“What was the hardest part?”</summary><div class="body"><p>“Getting my custom model reliable. A messy empty bed caused a false positive. I used the confidence scores to set the right threshold, which fixed it without losing real detections.”</p></div></details>
+<details><summary>“Is the AI result real or hardcoded?”</summary><div class="body"><p>“Fully live. The emotion, sentiment and bed result all come back from real AWS API calls each time — you can see the confidence numbers change per photo.”</p></div></details>
+<details><summary>“What would you improve?”</summary><div class="body"><p>“A bigger, more varied photo set to raise the model’s precision, a second ‘bed’ label to check the camera is aimed right, and continuous monitoring instead of on-demand checks.”</p></div></details>
+
+<h2 id="checklist">8. Demo-day checklist</h2>
+<div class="tip">
+<p><b>Before you present:</b></p>
+<ul style="color:#eaf2e6;">
+  <li><b>Start the Rekognition Custom Labels model</b> — the bed check won’t work unless it says RUNNING.</li>
+  <li>Log in once to check everything loads.</li>
+  <li>Have <b>two bed photos ready</b> (one occupied, one empty) and a face photo.</li>
+  <li>Open your AWS console tabs in advance so there’s no waiting.</li>
+</ul>
+<p><b>After you present:</b> <span style="color:#f4d67a;">STOP the model</span> so it doesn’t keep charging.</p>
+</div>
+<div class="card">
+<p><b>One-line summary to close with:</b></p>
+<p style="font-style:italic;">“NoFaceNoCase is a secure, serverless AWS app that uses two kinds of image recognition — a ready-made one and one I trained myself — plus Comprehend, Cognito, SNS and CloudFront, each doing a real job in a hospital workflow.”</p>
+</div>
+
+<p style="text-align:center;color:var(--mute);font-size:14px;margin-top:30px;">You’ve got this. Read it through twice, say the green boxes out loud, and you’ll sound confident. 🍀</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NoFaceNoCase — AWS Build Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#23291f; --ink-soft:#6f6a5c; --canvas:#f4efe3; --canvas-2:#efe8d8; --paper:#fffdf8;
+  --green:#2f5d4c; --green-deep:#21463a; --green-night:#152e26; --green-soft:#dde8e0;
+  --gold:#a9761f; --gold-soft:#f2e6cb; --rust:#b0402a; --rust-soft:#f2ddd3;
+  --line:#e3dac6; --line-soft:#ede6d5;
+  --font-body:"Inter",system-ui,sans-serif; --font-disp:"Fraunces",Georgia,serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:radial-gradient(1100px 600px at 100% -8%,var(--canvas-2),transparent 60%),var(--canvas);color:var(--ink);line-height:1.6;font-size:15.5px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:40px 22px 120px}
+
+header.top{margin-bottom:14px}
+.brand{font-family:var(--font-disp);font-weight:600;font-size:2.6rem;letter-spacing:-.02em;line-height:1.05}
+.brand em{color:var(--green);font-style:italic}
+.sub{color:var(--ink-soft);font-size:1.05rem;margin-top:6px}
+.meta{color:var(--ink-soft);font-size:.82rem;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+
+.progwrap{position:sticky;top:0;z-index:50;background:rgba(255,253,248,.93);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:22px 0 30px;box-shadow:0 6px 18px rgba(33,70,58,.07)}
+.progtop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.85rem;font-weight:600}
+.progbar{height:10px;background:var(--canvas-2);border-radius:99px;overflow:hidden;margin-top:8px;border:1px solid var(--line)}
+.progbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:99px;transition:width .35s ease}
+.btn{font-family:var(--font-body);font-size:.78rem;font-weight:600;padding:5px 13px;border-radius:99px;border:1.5px solid var(--line);background:var(--paper);color:var(--green-deep);cursor:pointer}
+.btn:hover{background:var(--green-soft);border-color:var(--green-soft)}
+
+h2.phase{font-family:var(--font-disp);font-weight:550;font-size:1.75rem;letter-spacing:-.02em;margin:44px 0 6px;padding-top:20px;border-top:2px solid var(--line)}
+h2.phase .num{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--green);color:#fff;font-family:var(--font-body);font-size:.95rem;font-weight:700;margin-right:12px;vertical-align:3px}
+.phase-note{color:var(--ink-soft);margin-bottom:20px;font-size:.95rem}
+
+.step{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px;display:grid;grid-template-columns:30px 1fr;gap:14px;align-items:start;box-shadow:0 1px 2px rgba(35,41,31,.04)}
+.step.done{background:#f7f6ef;border-color:var(--green-soft)}
+.step.done .body{opacity:.62}
+.step input[type=checkbox]{width:21px;height:21px;margin-top:2px;accent-color:var(--green);cursor:pointer}
+.step h3{font-size:1rem;font-weight:700;margin-bottom:5px}
+.step.done h3{text-decoration:line-through;text-decoration-color:var(--ink-soft)}
+.step p{margin-bottom:8px}
+.step p:last-child{margin-bottom:0}
+.step ul,.step ol{margin:8px 0 8px 20px}
+.step li{margin-bottom:5px}
+
+kbd{font-family:var(--font-mono);font-size:.82em;background:var(--green-soft);color:var(--green-deep);padding:2px 7px;border-radius:5px;font-weight:500;white-space:nowrap}
+.field{font-family:var(--font-mono);font-size:.82em;background:var(--gold-soft);color:#6d4c12;padding:2px 7px;border-radius:5px;font-weight:500}
+code{font-family:var(--font-mono);font-size:.85em;background:var(--canvas-2);padding:2px 6px;border-radius:5px}
+
+.codeblock{position:relative;margin:10px 0}
+.codeblock pre{background:var(--green-night);color:#e7f0e9;padding:15px 16px;border-radius:12px;overflow-x:auto;font-family:var(--font-mono);font-size:.8rem;line-height:1.6}
+.copybtn{position:absolute;top:9px;right:9px;font-size:.68rem;font-weight:600;padding:4px 11px;border-radius:99px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.13);color:#fff;cursor:pointer}
+.copybtn:hover{background:rgba(255,255,255,.26)}
+.copybtn.ok{background:#3f8f68;border-color:#3f8f68}
+
+.callout{border-radius:12px;padding:13px 16px;margin:12px 0;font-size:.9rem;border:1.5px solid}
+.warn{background:var(--rust-soft);border-color:#e6bfae;color:#7c2a19}
+.tip{background:var(--green-soft);border-color:#c3d7cb;color:var(--green-deep)}
+.money{background:var(--gold-soft);border-color:#e6d3a6;color:#6d4c12}
+.callout strong{font-weight:700}
+
+table{width:100%;border-collapse:collapse;font-size:.87rem;margin:12px 0;background:var(--paper);border-radius:10px;overflow:hidden}
+th{text-align:left;background:var(--canvas-2);font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;padding:9px 12px;color:var(--green-deep)}
+td{padding:9px 12px;border-top:1px solid var(--line-soft);vertical-align:top}
+td:first-child{font-weight:600}
+
+.f-note{font-size:.84rem;color:var(--ink-soft);margin-top:6px}
+footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);color:var(--ink-soft);font-size:.83rem}
+@media print{.progwrap{position:static}.copybtn{display:none}.step{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">NoFace<em>NoCase</em></div>
+  <div class="sub">Building the real AWS backend — click by click</div>
+  <div class="meta">Syed Ghazi · 2504242E · CAI2C09 &nbsp;·&nbsp; Region: <strong>ap-southeast-2 (Sydney)</strong> &nbsp;·&nbsp; Database: <strong>DynamoDB</strong> &nbsp;·&nbsp; Budget ceiling: <strong>$256</strong>, first flag at <strong>$80</strong></div>
+</header>
+
+<div class="progwrap">
+  <div class="progtop">
+    <span id="progtext">0 of 0 steps done</span>
+    <span><button class="btn" onclick="resetAll()">Reset all</button></span>
+  </div>
+  <div class="progbar"><span id="progfill"></span></div>
+</div>
+
+<div class="callout money">
+  <strong>What this will actually cost you.</strong> Everything below is pay-per-request — there is <strong>no server, no database instance, and no NAT gateway sitting there charging you by the hour</strong>. If you build it all and never touch it again, the bill is about <strong>$0.00/month</strong>. Building and testing it properly should land somewhere around <strong>$1–3 total</strong>. The single most expensive mistake in a project like this is an RDS instance or a NAT gateway left running (~$32–45/month each); this design has neither, on purpose.
+</div>
+
+<h2 class="phase" style="border-top:none;padding-top:0;margin-top:30px"><span class="num">✓</span>What this build satisfies</h2>
+<p class="phase-note">Mapped against the CAI2C09 spec so you can point at it in your report and demo.</p>
+<table>
+  <tr><th>Spec requirement</th><th>How it's met</th><th>Where</th></tr>
+  <tr><td>Cloud security</td><td>Cognito authentication, JWT-protected API, IAM least-privilege (scoped to exact resources, not <code>*</code>), S3 public access blocked, SSE-S3 encryption, HTTPS via CloudFront, clinician-only delete</td><td>4, 5, 7, 10</td></tr>
+  <tr><td>Full-stack web dev</td><td>Four-page responsive UI, mood-reactive theming, live search/sort/filter, forms, hand-drawn SVG chart</td><td>Already built</td></tr>
+  <tr><td>Serverless deployment to S3</td><td>Static site on S3 + CloudFront</td><td>10</td></tr>
+  <tr><td>Cloud database</td><td>DynamoDB — <strong>explicitly permitted by the spec</strong> ("RDS or DynamoDB")</td><td>1</td></tr>
+  <tr><td>≥2 CRUD ops (≥1 SELECT, ≥1 INSERT)</td><td><strong>All four</strong> — create, read, update, delete patients, plus check-in insert</td><td>6</td></tr>
+  <tr><td>Rekognition, domain-relevant, not hardcoded</td><td>Real <code>DetectFaces</code> on genuine uploads; emotion drives the mood state and distress alerts — core to the app, not bolted on</td><td>6, 9</td></tr>
+  <tr><td>Additional AWS services</td><td><strong>Cognito</strong> (auth), <strong>Comprehend</strong> (note sentiment), <strong>SNS</strong> (distress alerts), <strong>CloudFront</strong> (HTTPS/CDN) — none are on the excluded list</td><td>3, 4, 6, 10</td></tr>
+</table>
+<div class="callout tip"><strong>On the "additional services" mark.</strong> The excluded list is S3, RDS-MySQL, Lambda, API Gateway and Rekognition. Cognito, Comprehend, SNS and CloudFront are all fair game, and each has a real job in the app rather than being added for the sake of it — which is exactly what the top band asks for ("implemented creatively… significantly enhancing functionality").</div>
+
+<div class="callout warn">
+  <strong>Read this before you click anything.</strong> Two rules that will save you: <strong>(1)</strong> The region selector sits at the <em>top-right of every AWS page</em>. It must say <strong>Sydney ap-southeast-2</strong> every single time. If you build one thing in the wrong region, nothing will connect and the errors won't tell you why. <strong>(2)</strong> Do Phase 0 first. Don't skip to the fun parts. The budget alarm is what stands between you and a surprise bill.
+</div>
+
+<!-- ══════════ PHASE 0 ══════════ -->
+<h2 class="phase"><span class="num">0</span>Safety rails</h2>
+<p class="phase-note">Nothing here builds the app. This is the seatbelt — 15 minutes now so a mistake later costs you nothing.</p>
+
+<div class="step" data-id="0-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Sign in and confirm which free tier you're on</h3>
+    <p>Go to <code>https://console.aws.amazon.com</code> and sign in.</p>
+    <p>Click your <strong>account name (top-right)</strong> → <kbd>Billing and Cost Management</kbd>. On the left menu click <kbd>Free tier</kbd>.</p>
+    <p>This matters because AWS changed the rules on <strong>15 July 2025</strong>:</p>
+    <ul>
+      <li><strong>Account made before 15 Jul 2025</strong> → you have the old 12-month free tier. Rekognition gives you 5,000 free images/month and Comprehend 50,000 free units/month for the first year.</li>
+      <li><strong>Account made on/after 15 Jul 2025</strong> → you're on the newer credit model ($100, up to $200 if you finish the onboarding tasks) which expires after 6 months. Your usage draws down credits instead.</li>
+    </ul>
+    <p>Either way this project is tiny. Just note which one you are so the numbers on that page make sense later.</p>
+  </div>
+</div>
+
+<div class="step" data-id="0-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Set your region to Sydney — and learn where that selector lives</h3>
+    <p>Look at the <strong>very top-right</strong> of the AWS console, just left of your account name. It shows a region name.</p>
+    <p>Click it and choose <kbd>Asia Pacific (Sydney) ap-southeast-2</kbd>.</p>
+    <div class="callout tip"><strong>Burn this into your memory.</strong> Every single time you open a new AWS service page, glance at that selector. AWS silently resets it sometimes. Roughly 80% of "why isn't this working" in student projects is a resource built in the wrong region.</div>
+  </div>
+</div>
+
+<div class="step" data-id="0-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Turn on billing alerts</h3>
+    <p>Still in <kbd>Billing and Cost Management</kbd>. Left menu → <kbd>Billing preferences</kbd>.</p>
+    <p>Under <strong>Alert preferences</strong> click <kbd>Edit</kbd>, tick <span class="field">Receive AWS Free Tier alerts</span> and <span class="field">Receive CloudWatch billing alerts</span>, enter your email, then <kbd>Update</kbd>.</p>
+  </div>
+</div>
+
+<div class="step" data-id="0-4">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the budget with four tripwires</h3>
+    <p>Left menu → <kbd>Budgets</kbd> → <kbd>Create budget</kbd>.</p>
+    <ol>
+      <li>Choose <span class="field">Customize (advanced)</span>, then <span class="field">Cost budget</span>. Click <kbd>Next</kbd>.</li>
+      <li><strong>Budget name:</strong> <code>nfnc-monthly</code></li>
+      <li><strong>Period:</strong> Monthly. <strong>Budget renewal type:</strong> Recurring budget.</li>
+      <li><strong>Budgeting method:</strong> Fixed. <strong>Enter your budgeted amount:</strong> <code>256</code> — your full school allocation.</li>
+      <li>Click <kbd>Next</kbd> to reach <strong>Configure alerts</strong>.</li>
+    </ol>
+    <p>Now add <strong>five</strong> alert thresholds — click <kbd>Add an alert threshold</kbd> for each. All are "Actual" cost, and all email you:</p>
+    <table>
+      <tr><th>Threshold</th><th>Means</th><th>What it tells you</th></tr>
+      <tr><td>2%</td><td>$5</td><td>Normal for a full build + testing. Ignore.</td></tr>
+      <tr><td>4%</td><td>$10</td><td>Higher than expected — glance at Cost Explorer.</td></tr>
+      <tr><td>10%</td><td>$25</td><td>Something is running that shouldn't be. Investigate today.</td></tr>
+      <tr><td>31.25%</td><td>$80</td><td>Your first flag. You still have $176 left, but find the cause now.</td></tr>
+      <tr><td>100%</td><td>$256</td><td>Full allocation gone. Should be impossible with this design.</td></tr>
+    </table>
+    <div class="callout money">For context on how much headroom that is: this whole project is projected to cost about <strong>$0.50</strong>. Hitting even the first $80 flag would mean something is running that this architecture doesn't contain — check for an accidental EC2 instance, RDS database, or NAT gateway.</div>
+    <p>Put your email in each one, then <kbd>Next</kbd> → <kbd>Create budget</kbd>.</p>
+    <div class="callout warn"><strong>On a school sandbox, Billing is often locked.</strong> If you can't open Billing, Budgets or Cost Explorer, that's normal — TP holds those permissions centrally and is already watching the $256 for you. Don't fight it. Just skip steps 0-1, 0-3 and 0-4 and rely on the fact that this architecture has no hourly charges at all. If you want the numbers anyway, ask Mr Lee for read access to Cost Explorer.</div>
+  </div>
+</div>
+
+<div class="step" data-id="0-5">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Understand the login you already have</h3>
+    <div class="callout tip"><strong>You're on a TP-managed sandbox, so there's no IAM user to create.</strong> Your identity reads <code>sandbox7_IsbUsersPS/2504242E@student.tp.edu.sg</code> — the <code>PS</code> means <strong>Permission Set</strong>. You sign in through AWS IAM Identity Center (SSO) and assume a temporary role your school defined. Ignore any tutorial telling you to make an IAM admin user or secure the root account — you have neither, and you don't need them.</div>
+    <p>What this means in practice:</p>
+    <ul>
+      <li><strong>Your session expires.</strong> Usually after a few hours. When buttons start failing for no reason, sign in again — it's almost always just an expired session.</li>
+      <li><strong>Your permissions are set by TP</strong>, not by you, and may be narrower than a normal admin. The next step checks the one that matters.</li>
+      <li><strong>There may be guardrails</strong> (Service Control Policies) silently blocking some services or regions. If something is flat-out refused no matter what you try, that's the cause — ask your tutor rather than fighting it.</li>
+    </ul>
+    <p>To see what you can do: <kbd>IAM</kbd> → <kbd>Roles</kbd> → search for the role matching your permission set name → <kbd>Permissions</kbd> tab. That's your real allow-list.</p>
+  </div>
+</div>
+
+<div class="step" data-id="0-5b">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>The one make-or-break check: can you create an IAM role?</h3>
+    <p>Phase 5 needs you to create a role for the Lambda. Some school sandboxes block this and force you onto a pre-made role instead. <strong>Find out now, not in an hour.</strong></p>
+    <ol>
+      <li><kbd>IAM</kbd> → <kbd>Roles</kbd> → <kbd>Create role</kbd>.</li>
+      <li>Pick <span class="field">AWS service</span> → <span class="field">Lambda</span> → <kbd>Next</kbd>.</li>
+      <li>Don't tick any policy yet. <kbd>Next</kbd>.</li>
+      <li><strong>Role name:</strong> <code>nfnc-permission-test</code> → <kbd>Create role</kbd>.</li>
+    </ol>
+    <table>
+      <tr><th>Result</th><th>What it means</th></tr>
+      <tr><td><strong>Role is created</strong></td><td>You're fine. Delete this test role and follow the guide exactly as written.</td></tr>
+      <tr><td><strong>Access denied / explicit deny</strong></td><td>Your sandbox blocks role creation. Go to <kbd>Roles</kbd> and look for an existing one like <code>LabRole</code>, <code>SandboxRole</code> or similar. In Phase 6 you'd select that instead of <code>nfnc-lambda-role</code>, and skip Phase 5 entirely. <strong>Check with Mr Lee which role to use.</strong></td></tr>
+      <tr><td><strong>Asks for a permissions boundary</strong></td><td>Your sandbox requires one. Attach whatever boundary policy it offers, then continue.</td></tr>
+    </table>
+    <div class="callout warn"><strong>Do this before anything else.</strong> If role creation is blocked, the whole Lambda phase changes shape, and it's much cheaper to find out in two minutes than after you've built the database and API.</div>
+  </div>
+</div>
+
+<div class="step" data-id="0-6">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Write down your account ID</h3>
+    <p>Click your account name (top-right). You'll see <strong>Account ID</strong> — a 12-digit number.</p>
+    <p>Copy it into the box below. The guide will paste it into the right places for you as you go.</p>
+    <p style="margin-top:10px">
+      <label style="font-weight:600;font-size:.85rem;display:block;margin-bottom:5px">Your 12-digit Account ID</label>
+      <input id="acctInput" type="text" placeholder="123456789012" maxlength="12"
+        style="font-family:var(--font-mono);font-size:.9rem;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fffefb;width:230px" />
+    </p>
+    <p class="f-note">Stored only in this browser. It's not a secret, but it identifies your account, so don't post it publicly.</p>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 1 ══════════ -->
+<h2 class="phase"><span class="num">1</span>DynamoDB — the database</h2>
+<p class="phase-note">Three tables. On-demand billing means you pay per request and <strong>nothing at all when idle</strong>. The free allowance (25 GB storage, 2.5M reads, 2.5M writes a month) is thousands of times more than this project will ever use.</p>
+
+<div class="step" data-id="1-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the patients table</h3>
+    <ol>
+      <li>Top search bar → type <kbd>DynamoDB</kbd> → open it. <strong>Check the region says Sydney.</strong></li>
+      <li>Left menu → <kbd>Tables</kbd> → <kbd>Create table</kbd>.</li>
+      <li><strong>Table name:</strong> <code>nfnc-patients</code></li>
+      <li><strong>Partition key:</strong> <code>patientId</code> — leave the type as <span class="field">String</span>.</li>
+      <li><strong>Sort key:</strong> leave it <strong>empty</strong>.</li>
+      <li>Under <strong>Table settings</strong> pick <span class="field">Customize settings</span>.</li>
+      <li>Under <strong>Table class</strong> leave <span class="field">DynamoDB Standard</span>.</li>
+      <li>Under <strong>Read/write capacity settings</strong> choose <span class="field">On-demand</span>. &nbsp;<strong>This is the important one.</strong></li>
+      <li>Leave everything else alone. Scroll down → <kbd>Create table</kbd>.</li>
+    </ol>
+    <div class="callout warn"><strong>Do not pick Provisioned.</strong> On-demand costs nothing when nothing is happening. Provisioned charges you around the clock whether you use it or not.</div>
+  </div>
+</div>
+
+<div class="step" data-id="1-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the check-ins table</h3>
+    <p>Same steps, but this one needs a sort key so we can pull all check-ins for one patient in a single query.</p>
+    <ul>
+      <li><strong>Table name:</strong> <code>nfnc-checkins</code></li>
+      <li><strong>Partition key:</strong> <code>patientId</code> &nbsp;(String)</li>
+      <li><strong>Sort key:</strong> <code>checkinId</code> &nbsp;(String) &nbsp;← <strong>this table has one</strong></li>
+      <li><span class="field">Customize settings</span> → <span class="field">On-demand</span></li>
+    </ul>
+    <p><kbd>Create table</kbd>.</p>
+  </div>
+</div>
+
+<div class="step" data-id="1-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the medications table</h3>
+    <ul>
+      <li><strong>Table name:</strong> <code>nfnc-medications</code></li>
+      <li><strong>Partition key:</strong> <code>patientId</code> &nbsp;(String)</li>
+      <li><strong>Sort key:</strong> <code>medId</code> &nbsp;(String)</li>
+      <li><span class="field">Customize settings</span> → <span class="field">On-demand</span></li>
+    </ul>
+    <p><kbd>Create table</kbd>. Wait until all three show <strong>Active</strong> in the table list.</p>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 2 ══════════ -->
+<h2 class="phase"><span class="num">2</span>S3 — where photos land</h2>
+<p class="phase-note">One private bucket. Patient photos are sensitive, so this stays locked shut and auto-deletes old images.</p>
+
+<div class="step" data-id="2-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the photo bucket</h3>
+    <ol>
+      <li>Search <kbd>S3</kbd> → open it → <kbd>Create bucket</kbd>.</li>
+      <li><strong>AWS Region:</strong> must read <span class="field">Asia Pacific (Sydney) ap-southeast-2</span>.</li>
+      <li><strong>Bucket name:</strong> bucket names are globally unique across all of AWS, so add digits until it's accepted. Use:<br />
+        <code>nfnc-patient-photos-<span class="acct-suffix">YOURNUMBERS</span></code></li>
+      <li><strong>Object Ownership:</strong> leave <span class="field">ACLs disabled</span>.</li>
+      <li><strong>Block Public Access:</strong> leave <strong>all four boxes ticked</strong>. Do not touch this.</li>
+      <li><strong>Bucket Versioning:</strong> <span class="field">Disable</span> (versioning keeps every copy forever and quietly grows your storage bill).</li>
+      <li><strong>Default encryption:</strong> <span class="field">Server-side encryption with Amazon S3 managed keys (SSE-S3)</span>. Free.</li>
+      <li><kbd>Create bucket</kbd>.</li>
+    </ol>
+    <p><strong>Write your exact bucket name down.</strong> You'll need it three more times.</p>
+    <p style="margin-top:10px">
+      <label style="font-weight:600;font-size:.85rem;display:block;margin-bottom:5px">Your bucket name</label>
+      <input id="bucketInput" type="text" placeholder="nfnc-patient-photos-12345"
+        style="font-family:var(--font-mono);font-size:.9rem;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fffefb;width:330px" />
+    </p>
+  </div>
+</div>
+
+<div class="step" data-id="2-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Auto-delete photos after 30 days</h3>
+    <p>Good privacy practice and it means your storage bill can never creep up.</p>
+    <ol>
+      <li>Click into your new bucket → <kbd>Management</kbd> tab → <kbd>Create lifecycle rule</kbd>.</li>
+      <li><strong>Lifecycle rule name:</strong> <code>delete-after-30-days</code></li>
+      <li><strong>Choose a rule scope:</strong> <span class="field">Apply to all objects in the bucket</span> → tick the acknowledgement box that appears.</li>
+      <li>Under <strong>Lifecycle rule actions</strong> tick <span class="field">Expire current versions of objects</span>.</li>
+      <li><strong>Days after object creation:</strong> <code>30</code></li>
+      <li><kbd>Create rule</kbd>.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 3 ══════════ -->
+<h2 class="phase"><span class="num">3</span>SNS — distress alerts</h2>
+<p class="phase-note">The thing that emails a clinician when Rekognition sees serious distress. First 1,000 emails a month are free.</p>
+
+<div class="step" data-id="3-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the topic</h3>
+    <ol>
+      <li>Search <kbd>SNS</kbd> → open <strong>Amazon SNS</strong> → left menu <kbd>Topics</kbd> → <kbd>Create topic</kbd>.</li>
+      <li><strong>Type:</strong> <span class="field">Standard</span> &nbsp;(not FIFO)</li>
+      <li><strong>Name:</strong> <code>nfnc-distress-alerts</code></li>
+      <li>Leave the rest default → scroll down → <kbd>Create topic</kbd>.</li>
+    </ol>
+    <p>On the topic page, copy the <strong>ARN</strong> at the top. It looks like:</p>
+    <div class="codeblock"><pre id="snsarn">arn:aws:sns:ap-southeast-2:ACCOUNT_ID:nfnc-distress-alerts</pre><button class="copybtn" data-copy="#snsarn">Copy</button></div>
+  </div>
+</div>
+
+<div class="step" data-id="3-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Subscribe your email and confirm it</h3>
+    <ol>
+      <li>On the topic page click <kbd>Create subscription</kbd>.</li>
+      <li><strong>Protocol:</strong> <span class="field">Email</span></li>
+      <li><strong>Endpoint:</strong> your email address</li>
+      <li><kbd>Create subscription</kbd>.</li>
+      <li><strong>Go to your inbox</strong> and click the <strong>Confirm subscription</strong> link in the AWS email.</li>
+    </ol>
+    <div class="callout warn"><strong>Don't skip the confirmation.</strong> Until you click that link the subscription sits as "Pending confirmation" and no alert will ever reach you. This trips up a lot of people because the code still reports success.</div>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 4 ══════════ -->
+<h2 class="phase"><span class="num">4</span>Cognito — staff logins</h2>
+<p class="phase-note">Replaces the fake login. 10,000 monthly users free, permanently — you'll have two.</p>
+
+<div class="step" data-id="4-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the user pool</h3>
+    <ol>
+      <li>Search <kbd>Cognito</kbd> → open it → <kbd>Create user pool</kbd>.</li>
+      <li>If asked for an application type choose <span class="field">Single-page application (SPA)</span>.</li>
+      <li><strong>Name:</strong> <code>nfnc-staff</code></li>
+      <li><strong>Options for sign-in identifiers:</strong> tick <span class="field">Email</span>.</li>
+      <li><strong>Required attributes for sign-up:</strong> add <span class="field">name</span>.</li>
+      <li>Work through the remaining screens leaving defaults, then <kbd>Create</kbd>.</li>
+    </ol>
+    <div class="callout tip">The newer Cognito wizard is shorter than older tutorials show. If your screen doesn't match exactly, the things that actually matter are: sign in with <strong>email</strong>, and an app client with <strong>no client secret</strong> (next step).</div>
+  </div>
+</div>
+
+<div class="step" data-id="4-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Configure the app client — the step everyone gets wrong</h3>
+    <p>Open your pool → <kbd>App clients</kbd> in the left menu → click your app client.</p>
+    <p>Click <kbd>Edit</kbd> on <strong>App client information</strong> and check:</p>
+    <ul>
+      <li><strong>Client secret:</strong> must be <span class="field">Don't generate a client secret</span>. A browser app cannot keep a secret, and login will fail with a confusing error if one exists.</li>
+      <li>Under <strong>Authentication flows</strong>, tick <span class="field">ALLOW_USER_PASSWORD_AUTH</span>. Without this you get <code>InvalidParameterException: Auth flow not enabled</code>.</li>
+      <li>Leave <span class="field">ALLOW_REFRESH_TOKEN_AUTH</span> ticked.</li>
+    </ul>
+    <p><kbd>Save changes</kbd>.</p>
+    <p>Now copy these two values — you need them for <code>config.js</code>:</p>
+    <ul>
+      <li><strong>User pool ID</strong> (Overview page, looks like <code>ap-southeast-2_aB1cD2eF3</code>)</li>
+      <li><strong>Client ID</strong> (App client page, a long lowercase string)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step" data-id="4-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the nurse and clinician groups</h3>
+    <p>These drive the role chip in the app and the clinician-only delete button.</p>
+    <ol>
+      <li>In your pool → <kbd>Groups</kbd> → <kbd>Create group</kbd>.</li>
+      <li><strong>Group name:</strong> <code>nurse</code> → <kbd>Create</kbd>.</li>
+      <li><kbd>Create group</kbd> again → <strong>Group name:</strong> <code>clinician</code> → <kbd>Create</kbd>.</li>
+    </ol>
+    <p class="f-note">Spelling matters — the Lambda checks for the exact string <code>clinician</code> before allowing a delete.</p>
+  </div>
+</div>
+
+<div class="step" data-id="4-4">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create your two staff users</h3>
+    <p>In your pool → <kbd>Users</kbd> → <kbd>Create user</kbd>. Do this twice:</p>
+    <table>
+      <tr><th></th><th>Nurse</th><th>Clinician</th></tr>
+      <tr><td>Email address</td><td><code>nurse@nfnc.sg</code></td><td><code>clinician@nfnc.sg</code></td></tr>
+      <tr><td>name</td><td><code>SN Farah Binte Osman</code></td><td><code>Dr. Aisha Rahman</code></td></tr>
+      <tr><td>Group to add</td><td><code>nurse</code></td><td><code>clinician</code></td></tr>
+    </table>
+    <p>For each one:</p>
+    <ul>
+      <li>Choose <span class="field">Don't send an invitation</span> (those addresses aren't real inboxes).</li>
+      <li>Tick <span class="field">Mark email address as verified</span>.</li>
+      <li>Set <strong>Password</strong> to <code>Demo123!</code> and pick <span class="field">Set a permanent password</span> if offered — but don't worry if that option isn't available, see below.</li>
+    </ul>
+    <div class="callout tip"><strong>If the user ends up with status "Force change password":</strong> that's fine, and on a school sandbox it's actually the normal outcome — many sandboxes block the admin "set password directly" action as a guardrail (its options show up greyed out in the Actions menu). You don't need that permission. <code>js/api.aws.js</code> already handles this: the very first time someone signs in with <code>Demo123!</code>, Cognito issues a one-time challenge, and the login code automatically confirms that same password as permanent, with no extra click and no admin action needed. After that first sign-in the account behaves normally. This only needs to happen once per user.</div>
+    <p>After creating each user, open them → <kbd>Group memberships</kbd> → <kbd>Add user to group</kbd> → pick the right group.</p>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 5 ══════════ -->
+<h2 class="phase"><span class="num">5</span>IAM — what the Lambda is allowed to touch</h2>
+<p class="phase-note">A tight permission set instead of the usual "give it admin and hope". This is a marks-earning detail.</p>
+
+<div class="step" data-id="5-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the permission policy</h3>
+    <ol>
+      <li>Search <kbd>IAM</kbd> → left menu <kbd>Policies</kbd> → <kbd>Create policy</kbd>.</li>
+      <li>Click the <kbd>JSON</kbd> tab. Delete whatever is in the box.</li>
+      <li>Paste the block below. <strong>It already has your account ID and bucket name filled in</strong> if you entered them in Phase 0/2.</li>
+    </ol>
+    <div class="codeblock"><pre id="iampolicy">loading…</pre><button class="copybtn" data-copy="#iampolicy">Copy</button></div>
+    <ol start="4">
+      <li><kbd>Next</kbd>. <strong>Policy name:</strong> <code>nfnc-lambda-policy</code></li>
+      <li><kbd>Create policy</kbd>.</li>
+    </ol>
+    <p class="f-note">This exact file is also saved in your project at <code>aws/nfnc-lambda-policy.json</code>.</p>
+  </div>
+</div>
+
+<div class="step" data-id="5-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the role that uses it</h3>
+    <ol>
+      <li>IAM → <kbd>Roles</kbd> → <kbd>Create role</kbd>.</li>
+      <li><strong>Trusted entity type:</strong> <span class="field">AWS service</span>.</li>
+      <li><strong>Use case:</strong> pick <span class="field">Lambda</span>. <kbd>Next</kbd>.</li>
+      <li>In the search box type <code>nfnc-lambda-policy</code> and <strong>tick it</strong>. <kbd>Next</kbd>.</li>
+      <li><strong>Role name:</strong> <code>nfnc-lambda-role</code></li>
+      <li><kbd>Create role</kbd>.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 6 ══════════ -->
+<h2 class="phase"><span class="num">6</span>Lambda — the backend itself</h2>
+<p class="phase-note">One function handling every route. 1M requests a month free, forever.</p>
+
+<div class="step" data-id="6-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the function</h3>
+    <ol>
+      <li>Search <kbd>Lambda</kbd> → <kbd>Create function</kbd>.</li>
+      <li>Keep <span class="field">Author from scratch</span>.</li>
+      <li><strong>Function name:</strong> <code>nfnc-api</code></li>
+      <li><strong>Runtime:</strong> <span class="field">Python 3.13</span> (or the newest Python offered).</li>
+      <li><strong>Architecture:</strong> <span class="field">arm64</span> — slightly cheaper than x86.</li>
+      <li>Expand <strong>Change default execution role</strong> → choose <span class="field">Use an existing role</span> → select <code>nfnc-lambda-role</code>.</li>
+      <li><kbd>Create function</kbd>.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="step" data-id="6-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Paste in the code</h3>
+    <ol>
+      <li>On the function page scroll to the <strong>Code source</strong> editor.</li>
+      <li>Open <code>lambda_function.py</code> in the editor tabs. Select everything (<kbd>Ctrl+A</kbd>) and delete it.</li>
+      <li>Open the file <code>aws/lambda_function.py</code> from your project folder, copy the whole thing, and paste it in.</li>
+      <li>Press <kbd>Ctrl+S</kbd>, then click the <kbd>Deploy</kbd> button.</li>
+    </ol>
+    <div class="callout tip">Wait for the "Changes deployed" banner. Editing and forgetting to hit Deploy is the classic Lambda time-waster — the console keeps showing your new code while AWS keeps running the old one.</div>
+  </div>
+</div>
+
+<div class="step" data-id="6-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Set the environment variables</h3>
+    <p><kbd>Configuration</kbd> tab → <kbd>Environment variables</kbd> → <kbd>Edit</kbd> → <kbd>Add environment variable</kbd> five times:</p>
+    <table>
+      <tr><th>Key</th><th>Value</th></tr>
+      <tr><td><code>PATIENTS_TABLE</code></td><td><code>nfnc-patients</code></td></tr>
+      <tr><td><code>CHECKINS_TABLE</code></td><td><code>nfnc-checkins</code></td></tr>
+      <tr><td><code>MEDS_TABLE</code></td><td><code>nfnc-medications</code></td></tr>
+      <tr><td><code>PHOTO_BUCKET</code></td><td><span class="bucket-name">your bucket name</span></td></tr>
+      <tr><td><code>SNS_TOPIC_ARN</code></td><td><span class="sns-arn">your topic ARN</span></td></tr>
+    </table>
+    <p><kbd>Save</kbd>. Spelling of the keys must be exact — the function reads them by name and will crash on startup if one is missing.</p>
+  </div>
+</div>
+
+<div class="step" data-id="6-4">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Raise the timeout</h3>
+    <p><kbd>Configuration</kbd> → <kbd>General configuration</kbd> → <kbd>Edit</kbd>:</p>
+    <ul>
+      <li><strong>Memory:</strong> <code>512</code> MB</li>
+      <li><strong>Timeout:</strong> <code>0</code> min <code>30</code> sec</li>
+    </ul>
+    <p><kbd>Save</kbd>.</p>
+    <p class="f-note">The 3-second default isn't enough for a Rekognition call. More memory also means a faster CPU, so 512 MB often costs <em>less</em> than 128 MB because the function finishes sooner.</p>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 7 ══════════ -->
+<h2 class="phase"><span class="num">7</span>API Gateway — the front door</h2>
+<p class="phase-note">HTTP API, not REST API — it's about a third of the price and has Cognito JWT checking built in.</p>
+
+<div class="step" data-id="7-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the HTTP API</h3>
+    <ol>
+      <li>Search <kbd>API Gateway</kbd> → on the API type cards find <strong>HTTP API</strong> → click its <kbd>Build</kbd> button.</li>
+      <li><strong>Integrations:</strong> <kbd>Add integration</kbd> → <span class="field">Lambda</span> → pick <code>nfnc-api</code>.</li>
+      <li><strong>API name:</strong> <code>nfnc-api</code> → <kbd>Next</kbd>.</li>
+      <li><strong>Configure routes:</strong> set <strong>Method</strong> to <span class="field">ANY</span> and <strong>Resource path</strong> to <code>/{proxy+}</code> — typed exactly, braces and plus included. <kbd>Next</kbd>.</li>
+      <li><strong>Stages:</strong> leave <code>$default</code> with auto-deploy on. <kbd>Next</kbd> → <kbd>Create</kbd>.</li>
+    </ol>
+    <p>Copy the <strong>Invoke URL</strong> from the API detail page. It looks like <code>https://a1b2c3d4e5.execute-api.ap-southeast-2.amazonaws.com</code>. No trailing slash.</p>
+  </div>
+</div>
+
+<div class="step" data-id="7-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Turn on CORS — otherwise the browser blocks everything</h3>
+    <ol>
+      <li>Left menu → <kbd>CORS</kbd> → <kbd>Configure</kbd>.</li>
+      <li><strong>Access-Control-Allow-Origin:</strong> type <code>*</code> and press <kbd>Add</kbd>.</li>
+      <li><strong>Access-Control-Allow-Headers:</strong> add <code>content-type</code>, then add <code>authorization</code> (two separate entries).</li>
+      <li><strong>Access-Control-Allow-Methods:</strong> add <code>*</code>.</li>
+      <li><kbd>Save</kbd>.</li>
+    </ol>
+    <div class="callout tip">Forgetting <code>authorization</code> here produces the single most common error in this whole build: the app looks logged in but every request fails with a CORS message in the browser console. If that happens, come straight back to this step.</div>
+    <p class="f-note">For a real deployment you'd replace <code>*</code> with your actual site URL. For a marked prototype, <code>*</code> is fine — but say so in your report.</p>
+  </div>
+</div>
+
+<div class="step" data-id="7-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Lock the API behind Cognito</h3>
+    <ol>
+      <li>Left menu → <kbd>Authorization</kbd> → <kbd>Manage authorizers</kbd> tab → <kbd>Create</kbd>.</li>
+      <li><strong>Authorizer type:</strong> <span class="field">JWT</span></li>
+      <li><strong>Name:</strong> <code>nfnc-cognito</code></li>
+      <li><strong>Identity source:</strong> <code>$request.header.Authorization</code></li>
+      <li><strong>Issuer URL:</strong> paste this (fill in your pool ID):<br />
+        <code>https://cognito-idp.ap-southeast-2.amazonaws.com/YOUR_USER_POOL_ID</code></li>
+      <li><strong>Audience:</strong> your Cognito <strong>App client ID</strong>.</li>
+      <li><kbd>Create</kbd>.</li>
+    </ol>
+    <p>Now attach it: <kbd>Attach authorizers to routes</kbd> tab → click the <code>ANY /{proxy+}</code> route → <kbd>Attach authorizer</kbd> → choose <code>nfnc-cognito</code> → <kbd>Attach authorizer</kbd>.</p>
+    <div class="callout tip">The issuer URL has <strong>no</strong> trailing slash and <strong>no</strong> <code>https://</code> duplication. It's a very common typo.</div>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 8 ══════════ -->
+<h2 class="phase"><span class="num">8</span>Wire up the website</h2>
+<p class="phase-note">Two files, already written and sitting in your project folder.</p>
+
+<div class="step" data-id="8-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Fill in config.js</h3>
+    <p>Open <code>js/config.js</code> and put in the four values you collected:</p>
+    <div class="codeblock"><pre id="cfgblock">loading…</pre><button class="copybtn" data-copy="#cfgblock">Copy</button></div>
+    <p class="f-note">If you typed your account ID and bucket earlier, the region is already right. Replace the two Cognito values and the API URL with yours.</p>
+  </div>
+</div>
+
+<div class="step" data-id="8-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Swap the fake API for the real one</h3>
+    <p>In your <code>js</code> folder:</p>
+    <ol>
+      <li>Rename <code>api.js</code> → <code>api.mock.js</code> &nbsp;(keep it — it's your fallback if the demo network dies)</li>
+      <li>Rename <code>api.aws.js</code> → <code>api.js</code></li>
+    </ol>
+    <p>Nothing else changes. Every function kept its original name on purpose.</p>
+  </div>
+</div>
+
+<div class="step" data-id="8-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Load config.js on all four pages</h3>
+    <p>In <code>index.html</code>, <code>dashboard.html</code>, <code>patient.html</code> and <code>checkin.html</code>, find the line near the bottom that loads the API and add <code>config.js</code> <strong>directly above it</strong>:</p>
+    <div class="codeblock"><pre id="scripttags">&lt;script src="js/config.js"&gt;&lt;/script&gt;
+&lt;script src="js/api.js"&gt;&lt;/script&gt;</pre><button class="copybtn" data-copy="#scripttags">Copy</button></div>
+    <p>Order matters — <code>config.js</code> must come first or the API file won't find the settings.</p>
+  </div>
+</div>
+
+<div class="step" data-id="8-4">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Send the photo to Rekognition</h3>
+    <p>In <code>js/checkin.js</code>, find the line inside <code>handlePhoto</code> that reads:</p>
+    <div class="codeblock"><pre id="oldcall">const res = await apiAnalyseImage(file);</pre><button class="copybtn" data-copy="#oldcall">Copy</button></div>
+    <p>Change it to pass the patient through as well, so the photo is filed under the right person in S3:</p>
+    <div class="codeblock"><pre id="newcall">const res = await apiAnalyseImage(file, patientId);</pre><button class="copybtn" data-copy="#newcall">Copy</button></div>
+    <p>Just below it, make the no-face case safe:</p>
+    <div class="codeblock"><pre id="facecheck">if (!res.success || !res.rekognition.FaceDetails.length) {
+  showToast(res.message || "No face detected — try another photo.");
+  dropzone.querySelector("span").innerHTML = "Click to try a different photo.";
+  return;
+}</pre><button class="copybtn" data-copy="#facecheck">Copy</button></div>
+    <p>Paste that <strong>immediately after</strong> the <code>apiAnalyseImage</code> line and before the line starting <code>rekognitionEmotions =</code>.</p>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 9 ══════════ -->
+<h2 class="phase"><span class="num">9</span>Test it</h2>
+<p class="phase-note">In order. Each test proves one layer works before you blame the next one.</p>
+
+<div class="step" data-id="9-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Serve the site properly (not by double-clicking)</h3>
+    <p>Opening the HTML straight off your disk gives it a <code>file://</code> address, which browsers treat as hostile and block from calling APIs. Run a tiny local server instead.</p>
+    <p>Open a terminal in your <code>2504242E_SyedGhazi</code> project folder and run:</p>
+    <div class="codeblock"><pre id="serve">python -m http.server 8000</pre><button class="copybtn" data-copy="#serve">Copy</button></div>
+    <p>Then visit <code>http://localhost:8000/index.html</code>.</p>
+  </div>
+</div>
+
+<div class="step" data-id="9-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Test the login</h3>
+    <p>Sign in as <code>nurse@nfnc.sg</code> / <code>Demo123!</code></p>
+    <p>Press <kbd>F12</kbd> to open developer tools and watch the <strong>Console</strong> tab while you do it.</p>
+    <table>
+      <tr><th>What you see</th><th>What it means</th></tr>
+      <tr><td>Lands on the registry (probably empty)</td><td>Cognito is working. Continue.</td></tr>
+      <tr><td><code>Auth flow not enabled</code></td><td>Step 4-2 — tick ALLOW_USER_PASSWORD_AUTH.</td></tr>
+      <tr><td><code>Unable to verify secret hash</code></td><td>Your app client has a secret. Remake it without one.</td></tr>
+      <tr><td>"Couldn't finish setting up this account"</td><td>The password you typed doesn't match what the user was created with. Re-check step 4-4 — it must be exactly <code>Demo123!</code>.</td></tr>
+      <tr><td>"Incorrect email or password"</td><td>Check the email is typed exactly as created, and the password is exactly <code>Demo123!</code>.</td></tr>
+    </table>
+    <p class="f-note">First sign-in for each new user takes a moment longer — that's the automatic permanent-password step in <code>api.aws.js</code> running once. Every sign-in after that is instant.</p>
+  </div>
+</div>
+
+<div class="step" data-id="9-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Load the demo ward</h3>
+    <p>While signed in and sitting on the registry page, open the browser console (<kbd>F12</kbd> → Console) and run:</p>
+    <div class="codeblock"><pre id="seedcall">await apiSeed()</pre><button class="copybtn" data-copy="#seedcall">Copy</button></div>
+    <p>You should get back <code>{success: true, seeded: {patients: 6, checkins: 12, medications: 2}}</code>.</p>
+    <p>Refresh the page. All six patients should appear, sorted with the critical ones on top, and the ward mood bar should fill in.</p>
+    <table>
+      <tr><th>Problem</th><th>Fix</th></tr>
+      <tr><td>CORS error mentioning <code>authorization</code></td><td>Step 7-2 — add the <code>authorization</code> header.</td></tr>
+      <tr><td><code>401 Unauthorized</code></td><td>Step 7-3 — check issuer URL and audience.</td></tr>
+      <tr><td><code>500</code> with <code>KeyError</code></td><td>Step 6-3 — an env var name is wrong.</td></tr>
+      <tr><td><code>AccessDeniedException</code></td><td>Step 5-1 — account ID or bucket wrong in the policy.</td></tr>
+    </table>
+    <p class="f-note">Any 500 error: Lambda → <kbd>Monitor</kbd> → <kbd>View CloudWatch logs</kbd> → newest log stream. The real Python error is in there.</p>
+  </div>
+</div>
+
+<div class="step" data-id="9-4">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Test the full check-in with a real photo</h3>
+    <ol>
+      <li>Open any patient → <kbd>+ New check-in</kbd>.</li>
+      <li>Drag the mood slider, type a note with clear feeling in it — try <em>"Patient withdrawn and tearful, refused breakfast"</em>.</li>
+      <li>Upload a clear photo of a face. Use your own, or a freely-licensed stock face — <strong>never a real patient's</strong>.</li>
+      <li>Wait for the emotion bars. These are now genuine Rekognition confidence scores.</li>
+      <li>Hit <kbd>Save check-in</kbd>.</li>
+    </ol>
+    <p>Then check: the patient's trend chart has a new point, the sentiment chip reflects your note, and if a negative emotion scored ≥80% you have <strong>an actual email in your inbox</strong>.</p>
+    <div class="callout tip">To force an alert for your demo video, find a photo with a clearly sad or fearful expression. Rekognition needs real confidence above 80% to fire, so a neutral face won't trigger it.</div>
+  </div>
+</div>
+
+<!-- ══════════ PHASE CL — CUSTOM LABELS ══════════ -->
+<h2 class="phase"><span class="num">CL</span>Train a custom model — Rekognition Custom Labels</h2>
+<p class="phase-note">Train your <strong>own</strong> model that locates a person in a bed photo — bounding box, not just a whole-image label — then wire it into the bed check. A genuinely trained model (your labelled data → an AWS training job → accuracy metrics → real pixel coordinates back at inference), all inside AWS. It sits <em>alongside</em> the built-in emotion analysis, not instead of it.</p>
+
+<div class="callout money"><strong>Cost & time — read first.</strong> Training is a small one-off (billed per training-hour; a tiny dataset trains in well under an hour). The <strong>running</strong> model is billed <strong>per inference-hour (~a few $/hr)</strong> and only works while "Started". <strong>You must STOP the model after every test/demo</strong> or it quietly runs a bill. Start → test → stop, and the whole thing costs a few single dollars.</p></div>
+
+<div class="step" data-id="cl-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Gather the dataset</h3>
+    <p>Two folders of images:</p>
+    <ol>
+      <li><code>occupied/</code> — a bed with a person in it. Aim for <strong>~15–20 images</strong>.</li>
+      <li><code>empty/</code> — the same bed made up and empty. Aim for <strong>~15–20 images</strong>.</li>
+    </ol>
+    <p>Vary angle, distance, lighting and blanket arrangement so it learns "person present", not one exact pose. Phone photos of a real bed with a consenting volunteer are the cleanest source — your own data, no licensing or privacy issues, and honest to explain in the viva.</p>
+    <div class="callout tip">Keep both classes on similar backgrounds so the model learns <em>occupancy</em>, not "this room = occupied".</div>
+  </div>
+</div>
+
+<div class="step" data-id="cl-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Create the project &amp; dataset — bounding boxes, not whole-image tags</h3>
+    <p>This trains an <strong>object detector</strong>: instead of tagging each photo <code>occupied</code>/<code>empty</code>, you draw a box around the person in each occupied photo. Rekognition's labeling tool captures the pixel coordinates itself when you drag the box — you never type or compute a coordinate by hand, in training or at inference time.</p>
+    <ol>
+      <li>Console → <kbd>Rekognition</kbd> → left sidebar <kbd>Custom Labels</kbd>. If prompted, let it <strong>create the Custom Labels S3 bucket</strong> (accept the default).</li>
+      <li><kbd>Projects</kbd> → <kbd>Create project</kbd> → name <code>nfnc-bed-occupancy</code> → Create.</li>
+      <li><kbd>Datasets</kbd> → <kbd>Create dataset</kbd> → <span class="field">Start with a single dataset</span> (it auto-splits a test set at training time).</li>
+      <li><strong>Upload images from your computer</strong> → upload all <code>occupied/</code> and <code>empty/</code> images.</li>
+      <li>Add <strong>one</strong> label: <code>occupant</code>.</li>
+      <li>Open each <em>occupied</em> photo → select the <code>occupant</code> label → switch the tool to <span class="field">bounding box</span> → drag a rectangle around the person → save. Repeat for every occupied photo.</li>
+      <li>Leave every <em>empty</em> photo <strong>completely unlabeled</strong> — no box, no tag. These are your negative examples; they teach the model what "nobody here" looks like.</li>
+    </ol>
+    <div class="callout tip">This beats two whole-image labels because the model learns to actually find a person-shaped region, not guess from lighting or background. It also means inference hands back the exact pixel-ratio box it detected — real coordinates from the trained model, drawn live over your captured photo in the app.</div>
+  </div>
+</div>
+
+<div class="step" data-id="cl-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Train — then walk away</h3>
+    <ol>
+      <li>Project page → <kbd>Train model</kbd> → confirm the dataset → <kbd>Train</kbd>.</li>
+      <li>This runs on AWS's clock (typically 30 min to a couple of hours for a small set). <strong>Do the steps below while it trains.</strong></li>
+      <li>When done, open the model → <kbd>Evaluation results</kbd>. <strong>Screenshot the F1 score, precision and recall</strong> — gold for the report's development-process section.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="step" data-id="cl-4">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Start the model &amp; copy its ARN</h3>
+    <ol>
+      <li>Trained model page → <kbd>Start model</kbd> → inference units = <span class="field">1</span>. Wait for status <span class="field">RUNNING</span>.</li>
+      <li>Copy the <strong>ProjectVersion ARN</strong> shown (looks like <code>arn:aws:rekognition:ap-southeast-2:ACCOUNT_ID:project/nfnc-bed-occupancy/version/…</code>). You need it next.</li>
+    </ol>
+    <div class="callout warn"><strong>This is the meter running.</strong> From the moment it says RUNNING you're being billed per hour. Note the time; stop it the second you're done (step CL-7).</div>
+  </div>
+</div>
+
+<div class="step" data-id="cl-5">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Give the Lambda access + the ARN</h3>
+    <ol>
+      <li><strong>IAM:</strong> the Lambda role's policy now needs <code>rekognition:DetectCustomLabels</code>. It's already in <code>aws/nfnc-lambda-policy.json</code> — confirm the live policy has it (add to the Rekognition statement if you're editing by hand).</li>
+      <li><strong>Env var:</strong> Lambda console → <code>nfnc-api</code> → <kbd>Configuration</kbd> → <kbd>Environment variables</kbd> → <kbd>Edit</kbd> → <kbd>Add</kbd>. Key <code>CUSTOM_LABELS_ARN</code>, value = the ARN from step CL-4. Save.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="step" data-id="cl-6">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Deploy the updated Lambda code, then test</h3>
+    <ol>
+      <li>The backend already has a <code>/analyse/bed</code> route + <code>analyse_bed()</code> handler in <code>aws/lambda_function.py</code>. Copy the <strong>full</strong> file → paste into the Lambda Code editor → <kbd>Deploy</kbd>.</li>
+      <li>Open a patient page → <strong>Bed status</strong> → <kbd>Check if patient is in bed</kbd> → <kbd>Run check</kbd>.</li>
+      <li><strong>Occupied</strong> → green "Bed reads occupied (occupant NN%)", with the captured photo shown and a red box drawn over exactly where the model detected the person. <strong>Empty</strong> → amber "Bed reads empty" + a logged bed exit that updates triage and fires an SNS alert past the high-risk threshold.</li>
+    </ol>
+    <p class="f-note">If you see "model is not running", go back to CL-4 and confirm status = RUNNING. The route returns a clean 503 (not a crash) whenever the model is stopped, so the rest of the app keeps working.</p>
+  </div>
+</div>
+
+<div class="step" data-id="cl-7">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>STOP the model — do not skip</h3>
+    <ol>
+      <li>Rekognition console → your model → <kbd>Stop model</kbd>. Inference billing stops immediately.</li>
+      <li>Restart it only when you need to demo (and for the demo video). Stop it again after.</li>
+    </ol>
+    <div class="callout warn">This single habit is the difference between a few cents and a surprise bill. A model left RUNNING overnight is the one way this project costs real money.</div>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 10 ══════════ -->
+<h2 class="phase"><span class="num">10</span>Deploy the site to S3</h2>
+<p class="phase-note"><strong>Required by your spec</strong> — "Serverless deployment: your website should be hosted on AWS S3". This is a graded item, not a nice-to-have.</p>
+
+<div class="step" data-id="10-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Host the site on S3</h3>
+    <ol>
+      <li>S3 → <kbd>Create bucket</kbd> → name it <code>nfnc-site-<span class="acct-suffix">YOURNUMBERS</span></code>, region Sydney.</li>
+      <li><strong>Untick</strong> <span class="field">Block all public access</span> and accept the warning. This bucket is <em>meant</em> to be public — it's just your HTML. (Your photo bucket stays locked.)</li>
+      <li>Create it, then open it → <kbd>Properties</kbd> → scroll to <strong>Static website hosting</strong> → <kbd>Edit</kbd> → <span class="field">Enable</span> → <strong>Index document:</strong> <code>index.html</code> → <kbd>Save</kbd>.</li>
+      <li><kbd>Permissions</kbd> tab → <strong>Bucket policy</strong> → <kbd>Edit</kbd> → paste:</li>
+    </ol>
+    <div class="codeblock"><pre id="sitepolicy">loading…</pre><button class="copybtn" data-copy="#sitepolicy">Copy</button></div>
+    <ol start="5">
+      <li><kbd>Objects</kbd> tab → <kbd>Upload</kbd> → drag in your <code>index.html</code>, <code>dashboard.html</code>, <code>patient.html</code>, <code>checkin.html</code> and the whole <code>css</code> and <code>js</code> folders → <kbd>Upload</kbd>.</li>
+      <li>Back on <kbd>Properties</kbd> → <strong>Static website hosting</strong>, your live URL is at the bottom.</li>
+    </ol>
+    <div class="callout warn">Don't upload the <code>aws</code> folder. And never put AWS access keys in any file you upload — the frontend only needs the Cognito IDs, which are safe to expose.</div>
+  </div>
+</div>
+
+<div class="step" data-id="10-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Put CloudFront in front of it — this is your HTTPS</h3>
+    <p>Your S3 website endpoint is <strong>plain HTTP</strong>. Your marking rubric lists <em>"HTTPS enforced"</em> as part of top-band Cloud Security, so this step is worth real marks. CloudFront also gives you a free TLS certificate and is an <strong>additional AWS service</strong> you can justify in the report.</p>
+    <ol>
+      <li>Search <kbd>CloudFront</kbd> → <kbd>Create distribution</kbd>.</li>
+      <li><strong>Origin domain:</strong> click the box and pick your <strong>site bucket's website endpoint</strong>. If AWS offers both, choose the one ending <code>.s3-website-ap-southeast-2.amazonaws.com</code>.</li>
+      <li><strong>Viewer protocol policy:</strong> <span class="field">Redirect HTTP to HTTPS</span> &nbsp;← the bit that earns the mark.</li>
+      <li><strong>Allowed HTTP methods:</strong> <span class="field">GET, HEAD</span>.</li>
+      <li><strong>Default root object:</strong> <code>index.html</code></li>
+      <li><strong>Web Application Firewall:</strong> choose <span class="field">Do not enable security protections</span> — WAF costs about $5/month and you don't need it.</li>
+      <li><kbd>Create distribution</kbd>. It takes ~5 minutes to deploy.</li>
+    </ol>
+    <p>Your HTTPS URL is the <strong>Distribution domain name</strong> (like <code>d1a2b3c4d5e6f7.cloudfront.net</code>). <strong>Use this link in your report and demo</strong>, not the S3 one.</p>
+    <div class="callout money">CloudFront's always-free tier covers 1 TB of transfer and 10 million requests a month. A student project uses a rounding error of that. Just don't enable WAF.</div>
+  </div>
+</div>
+
+<div class="step" data-id="10-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Re-test on the live URL</h3>
+    <p>Open your CloudFront HTTPS link and run through the whole flow again: log in, view the registry, open a patient, save a check-in with a photo.</p>
+    <p>Everything should behave exactly as it did locally. If a page 404s, check you uploaded the <code>css</code> and <code>js</code> folders with their folder structure intact, not as loose files.</p>
+    <div class="callout tip">After you change any file, re-upload it to S3 <em>and</em> invalidate the CloudFront cache: distribution → <kbd>Invalidations</kbd> → <kbd>Create invalidation</kbd> → enter <code>/*</code>. First 1,000 invalidation paths a month are free.</div>
+  </div>
+</div>
+
+<!-- ══════════ PHASE 11 ══════════ -->
+<h2 class="phase"><span class="num">11</span>Package the submission</h2>
+<p class="phase-note">Straight from the spec. Getting a filename wrong is the cheapest possible way to lose marks.</p>
+
+<div class="step" data-id="11a-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Lambda code into .txt files</h3>
+    <p>The spec says: <em>"For Lambda functions, copy each function and paste them into separate .txt files."</em></p>
+    <p>You have one Lambda, so make one file named <code>nfnc-api_lambda.txt</code> containing the full contents of <code>aws/lambda_function.py</code>, and put it in your project folder.</p>
+    <div class="callout tip">Because you built one router Lambda instead of six small ones, mention that choice in your report — fewer cold starts, one deployment, simpler IAM. It reads as a deliberate design decision rather than a shortcut.</div>
+  </div>
+</div>
+
+<div class="step" data-id="11a-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Zip it with the exact required name</h3>
+    <p>Zip your <strong>entire web application</strong> — all HTML, the <code>css</code> and <code>js</code> folders, and the Lambda <code>.txt</code>.</p>
+    <p>The filename must be exactly:</p>
+    <div class="codeblock"><pre id="zipname">2504242E_SyedGhazi.zip</pre><button class="copybtn" data-copy="#zipname">Copy</button></div>
+    <p>Before you upload, open the zip and confirm <code>index.html</code>, <code>css/styles.css</code> and <code>js/api.js</code> are all in there with their folders intact.</p>
+    <div class="callout warn"><strong>Take out your real IDs if you're worried.</strong> Cognito pool/client IDs and the API URL are safe to expose (they're in every user's browser anyway) — but your API is protected by Cognito, so leave them in and the marker can actually run it. Never include AWS access keys.</div>
+  </div>
+</div>
+
+<div class="step" data-id="11a-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>The 30% that isn't code</h3>
+    <p>Report is 20% and presentation is 10%. Deadlines from your spec:</p>
+    <table>
+      <tr><th>Item</th><th>Due</th><th>Format</th></tr>
+      <tr><td>Deliverables Part 2 (code)</td><td><strong>Fri 14 Aug 2026, 1700</strong></td><td><code>2504242E_SyedGhazi.zip</code></td></tr>
+      <tr><td>Report</td><td><strong>Mon 17 Aug 2026, 0900</strong></td><td><code>2504242E_SyedGhazi.docx</code> — <strong>Word, not PDF</strong></td></tr>
+      <tr><td>Slides</td><td><strong>Mon 17 Aug 2026, 0900</strong></td><td>.pptx, max 15 slides</td></tr>
+      <tr><td>Demo video</td><td>with slides</td><td>≤5 min, YouTube <strong>unlisted</strong>, link in slides</td></tr>
+    </table>
+    <p>The report needs four sections: website intro with <strong>screenshots of every page</strong>, the Rekognition development process, the deployment process, and a setup guide for every AWS service explaining how they interact.</p>
+    <div class="callout tip"><strong>You already have most of section (c) and (d).</strong> This build guide <em>is</em> the deployment process and setup guide — every phase, config value and service dependency is documented. Rewrite it in report prose with your own screenshots and you've covered half the report.</div>
+  </div>
+</div>
+
+<h2 class="phase"><span class="num">12</span>After marking — tear it down</h2>
+<p class="phase-note">Do this once you've been graded. Takes five minutes and guarantees the bill stops.</p>
+
+<div class="step" data-id="11-1">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Check what you actually spent</h3>
+    <p>Billing and Cost Management → <kbd>Cost Explorer</kbd>. Group by <strong>Service</strong> to see the breakdown.</p>
+    <p>Expect a total in the low single dollars. If anything looks wrong, that view tells you exactly which service did it.</p>
+  </div>
+</div>
+
+<div class="step" data-id="11-2">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Delete everything, in this order</h3>
+    <table>
+      <tr><th>#</th><th>Service</th><th>What to delete</th></tr>
+      <tr><td>0</td><td>CloudFront</td><td>disable the distribution, wait for it to finish, then delete it</td></tr>
+      <tr><td>1</td><td>API Gateway</td><td>the <code>nfnc-api</code> API</td></tr>
+      <tr><td>2</td><td>Lambda</td><td>the <code>nfnc-api</code> function</td></tr>
+      <tr><td>3</td><td>DynamoDB</td><td>all three <code>nfnc-*</code> tables</td></tr>
+      <tr><td>4</td><td>S3</td><td>empty both buckets first, then delete them</td></tr>
+      <tr><td>5</td><td>Cognito</td><td>the <code>nfnc-staff</code> user pool</td></tr>
+      <tr><td>6</td><td>SNS</td><td>the topic and its subscription</td></tr>
+      <tr><td>7</td><td>CloudWatch</td><td>log group <code>/aws/lambda/nfnc-api</code></td></tr>
+      <tr><td>8</td><td>IAM</td><td>the role, then the policy</td></tr>
+    </table>
+    <p><strong>Keep the budget.</strong> It costs nothing and will tell you if you missed something.</p>
+    <div class="callout tip">S3 won't let you delete a bucket with anything in it. Open the bucket → <kbd>Empty</kbd> → type <code>permanently delete</code> → then <kbd>Delete</kbd> the bucket itself.</div>
+  </div>
+</div>
+
+<div class="step" data-id="11-3">
+  <input type="checkbox" />
+  <div class="body">
+    <h3>Check back in two days</h3>
+    <p>AWS billing lags by up to 24 hours. Look at Cost Explorer again a couple of days later and confirm the daily cost has flatlined at zero.</p>
+  </div>
+</div>
+
+<footer>
+  <p><strong>Where everything lives.</strong> Lambda code: <code>aws/lambda_function.py</code> · IAM policy: <code>aws/nfnc-lambda-policy.json</code> · Frontend config: <code>js/config.js</code> · Real API layer: <code>js/api.aws.js</code></p>
+  <p style="margin-top:8px">Free tier details verified July 2026. AWS changes pricing — check the console's own Free Tier page for what applies to your account.</p>
+</footer>
+
+</div>
+
+<script>
+const KEY = "nfnc_aws_guide_v1";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+const steps = Array.from(document.querySelectorAll(".step"));
+
+function refresh() {
+  const done = steps.filter(s => s.classList.contains("done")).length;
+  document.getElementById("progtext").textContent = done + " of " + steps.length + " steps done";
+  document.getElementById("progfill").style.width = (steps.length ? (done / steps.length * 100) : 0) + "%";
+}
+
+steps.forEach(step => {
+  const id = step.dataset.id;
+  const box = step.querySelector("input[type=checkbox]");
+  if (state[id]) { box.checked = true; step.classList.add("done"); }
+  box.addEventListener("change", () => {
+    step.classList.toggle("done", box.checked);
+    state[id] = box.checked;
+    save();
+    refresh();
+  });
+});
+
+function resetAll() {
+  if (!confirm("Clear all your ticks and start fresh?")) return;
+  state = {};
+  save();
+  steps.forEach(s => { s.classList.remove("done"); s.querySelector("input").checked = false; });
+  refresh();
+}
+
+/* account id + bucket name get injected into the code blocks */
+const acctInput = document.getElementById("acctInput");
+const bucketInput = document.getElementById("bucketInput");
+acctInput.value = state._acct || "";
+bucketInput.value = state._bucket || "";
+
+function acct() { return (state._acct && state._acct.length === 12) ? state._acct : "ACCOUNT_ID"; }
+function bucket() { return state._bucket || "YOUR_BUCKET_NAME"; }
+function siteBucket() { return (state._bucket ? state._bucket.replace("patient-photos", "site") : "YOUR_SITE_BUCKET"); }
+
+const IAM_TEMPLATE = () => `{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Logs",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:ap-southeast-2:${acct()}:*"
+    },
+    {
+      "Sid": "DynamoDataAccess",
+      "Effect": "Allow",
+      "Action": ["dynamodb:GetItem","dynamodb:PutItem","dynamodb:UpdateItem",
+                 "dynamodb:DeleteItem","dynamodb:Query","dynamodb:Scan","dynamodb:BatchWriteItem"],
+      "Resource": [
+        "arn:aws:dynamodb:ap-southeast-2:${acct()}:table/nfnc-patients",
+        "arn:aws:dynamodb:ap-southeast-2:${acct()}:table/nfnc-checkins",
+        "arn:aws:dynamodb:ap-southeast-2:${acct()}:table/nfnc-medications"
+      ]
+    },
+    {
+      "Sid": "PhotoBucket",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject","s3:GetObject"],
+      "Resource": "arn:aws:s3:::${bucket()}/*"
+    },
+    {
+      "Sid": "FaceAndText",
+      "Effect": "Allow",
+      "Action": ["rekognition:DetectFaces","comprehend:DetectSentiment"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DistressAlerts",
+      "Effect": "Allow",
+      "Action": "sns:Publish",
+      "Resource": "arn:aws:sns:ap-southeast-2:${acct()}:nfnc-distress-alerts"
+    }
+  ]
+}`;
+
+const SITE_TEMPLATE = () => `{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "PublicReadForWebsite",
+    "Effect": "Allow",
+    "Principal": "*",
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::${siteBucket()}/*"
+  }]
+}`;
+
+const CFG_TEMPLATE = () => `const NFNC_CONFIG = {
+  API_BASE_URL: "https://YOUR_API_ID.execute-api.ap-southeast-2.amazonaws.com",
+  REGION: "ap-southeast-2",
+  USER_POOL_ID: "ap-southeast-2_YOURPOOLID",
+  APP_CLIENT_ID: "YOUR_APP_CLIENT_ID",
+};`;
+
+function renderTemplates() {
+  document.getElementById("iampolicy").textContent = IAM_TEMPLATE();
+  document.getElementById("sitepolicy").textContent = SITE_TEMPLATE();
+  document.getElementById("cfgblock").textContent = CFG_TEMPLATE();
+  document.getElementById("snsarn").textContent =
+    "arn:aws:sns:ap-southeast-2:" + acct() + ":nfnc-distress-alerts";
+  document.querySelectorAll(".bucket-name").forEach(el => el.textContent = bucket());
+  document.querySelectorAll(".sns-arn").forEach(el =>
+    el.textContent = "arn:aws:sns:ap-southeast-2:" + acct() + ":nfnc-distress-alerts");
+  document.querySelectorAll(".acct-suffix").forEach(el =>
+    el.textContent = state._acct ? state._acct.slice(-5) : "YOURNUMBERS");
+}
+
+acctInput.addEventListener("input", () => {
+  state._acct = acctInput.value.replace(/\D/g, "").slice(0, 12);
+  acctInput.value = state._acct;
+  save(); renderTemplates();
+});
+bucketInput.addEventListener("input", () => {
+  state._bucket = bucketInput.value.trim();
+  save(); renderTemplates();
+});
+
+document.querySelectorAll(".copybtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.querySelector(btn.dataset.copy).textContent;
+    const done = () => {
+      const old = btn.textContent;
+      btn.textContent = "Copied";
+      btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = old; btn.classList.remove("ok"); }, 1400);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallback(text, done));
+    } else { fallback(text, done); }
+  });
+});
+
+function fallback(text, done) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+renderTemplates();
+refresh();
+</script>
+</body>
+</html>

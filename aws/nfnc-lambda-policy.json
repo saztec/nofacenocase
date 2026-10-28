@@ -1,0 +1,58 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Logs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:ap-southeast-2:ACCOUNT_ID:*"
+    },
+    {
+      "Sid": "DynamoDataAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:BatchWriteItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:ap-southeast-2:ACCOUNT_ID:table/nfnc-patients",
+        "arn:aws:dynamodb:ap-southeast-2:ACCOUNT_ID:table/nfnc-checkins",
+        "arn:aws:dynamodb:ap-southeast-2:ACCOUNT_ID:table/nfnc-medications"
+      ]
+    },
+    {
+      "Sid": "PhotoBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::PHOTO_BUCKET_NAME/*"
+    },
+    {
+      "Sid": "FaceAndText",
+      "Effect": "Allow",
+      "Action": [
+        "rekognition:DetectFaces",
+        "rekognition:DetectCustomLabels",
+        "comprehend:DetectSentiment"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DistressAlerts",
+      "Effect": "Allow",
+      "Action": "sns:Publish",
+      "Resource": "arn:aws:sns:ap-southeast-2:ACCOUNT_ID:nfnc-distress-alerts"
+    }
+  ]
+}

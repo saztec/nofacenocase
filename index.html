@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NoFaceNoCase — Staff Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="login-stage">
+    <section class="login-split">
+      <div class="login-brand">
+        <a class="wordmark" href="index.html">NoFace<span>NoCase</span>
+          <small>Patient wellness monitoring</small>
+        </a>
+        <p class="tagline"><strong>One calm view of every patient's wellbeing.</strong><br />
+          Record check-ins in seconds, let the platform read the signals, and get alerted the moment a patient needs you.</p>
+        <ul class="brand-points">
+          <li>Daily mood and observation check-ins</li>
+          <li>AI facial emotion and note sentiment analysis</li>
+          <li>Automatic distress alerts to the assigned clinician</li>
+        </ul>
+      </div>
+
+      <div class="login-form-panel">
+        <h1>Welcome back</h1>
+        <p class="lede">Sign in with your staff account to continue.</p>
+
+        <form id="loginForm" novalidate>
+          <div class="form-row">
+            <label class="field-label" for="email">Staff email</label>
+            <input type="email" id="email" autocomplete="username" placeholder="name@nfnc.sg" required />
+          </div>
+          <div class="form-row">
+            <label class="field-label" for="password">Password</label>
+            <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" required />
+          </div>
+
+          <div id="loginError" class="banner banner-alert hidden" role="alert">
+            <span class="icon">⚠</span><span id="loginErrorText"></span>
+          </div>
+
+          <button class="btn btn-primary" id="loginBtn" type="submit" style="width:100%">Sign in</button>
+        </form>
+
+        <div class="demo-creds">
+          <strong>Demo accounts:</strong><br />
+          Nurse: <code>nurse@nfnc.sg</code> &nbsp;·&nbsp; Clinician: <code>clinician@nfnc.sg</code><br />
+          Password for both: <code>Demo123!</code>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

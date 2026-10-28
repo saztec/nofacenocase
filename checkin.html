@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Check-in — NoFaceNoCase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="wordmark" href="dashboard.html">NoFace<span>NoCase</span>
+        <small>Patient wellness monitoring</small>
+      </a>
+      <nav class="top-nav" aria-label="Main navigation">
+        <a class="nav-link" href="dashboard.html">Patient registry</a>
+        <a class="nav-link active" href="#">New check-in</a>
+      </nav>
+      <div class="topbar-user">
+        <div class="who" id="userName"></div>
+        <span id="userRole" class="role-chip"></span>
+        <button class="btn btn-light btn-sm" onclick="logout()">Sign out</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="flex-between">
+        <div>
+          <p class="eyebrow" id="patientId">Check-in</p>
+          <h1 class="page-title">New wellness check-in</h1>
+          <p class="page-sub" id="patientMeta">Loading patient…</p>
+        </div>
+        <a class="btn btn-ghost" id="backLink" href="dashboard.html">← Back to patient</a>
+      </div>
+
+      <form id="checkinForm" novalidate>
+        <section class="card">
+          <p class="eyebrow">Step 1</p>
+          <h2 class="section-title">Mood and observations</h2>
+
+          <div class="form-row">
+            <label class="field-label" for="mood">Mood rating (1 = severe distress, 10 = thriving)</label>
+            <div style="display:flex; align-items:center; gap:20px">
+              <input type="range" id="mood" min="1" max="10" step="1" value="5" style="flex:1" />
+              <span class="mood-readout" id="moodReadout">5</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="field-label" for="notes">Clinical observations (optional)</label>
+            <textarea id="notes" placeholder="e.g. Patient engaged well during group activity, appetite improving…"></textarea>
+            <p class="hint">Notes are analysed by Amazon Comprehend for sentiment.</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <p class="eyebrow">Step 2</p>
+          <h2 class="section-title" style="margin-bottom:6px">Patient photograph (optional, with consent)</h2>
+          <p class="muted" style="font-size:0.85rem; margin-bottom:14px">The photo is analysed by AWS Rekognition for facial emotion.</p>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload patient photograph">
+            <div id="dropPrompt">
+              <strong>Click to choose a photo</strong> or drag one here<br />
+              <span style="font-size:0.78rem">JPG or PNG, taken with patient consent</span>
+            </div>
+          </div>
+          <input type="file" id="photoInput" accept="image/*" class="hidden" />
+
+          <div class="camera-row">
+            <button type="button" class="btn btn-ghost btn-sm" id="cameraBtn">📷 Use camera instead</button>
+          </div>
+
+          <div id="cameraPanel" class="camera-panel hidden">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <div class="camera-controls">
+              <button type="button" class="btn btn-primary btn-sm" id="captureBtn">Capture photo</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="cancelCameraBtn">Cancel</button>
+            </div>
+            <p class="hint">Captures a still photo for emotion analysis, then samples about 3 seconds of motion from the live feed to estimate the patient's current movement level.</p>
+          </div>
+
+          <div id="analysisPanel" class="hidden mt-16">
+            <p class="eyebrow">Rekognition result</p>
+            <div id="emotionBars"></div>
+          </div>
+
+          <div id="sentimentPanel" class="hidden mt-16">
+            <p class="eyebrow">Comprehend sentiment</p>
+            <div id="sentimentResult"></div>
+          </div>
+
+          <div id="movementPanel" class="hidden mt-16">
+            <p class="eyebrow">Live movement sample</p>
+            <div id="movementResult"></div>
+          </div>
+
+          <div id="alertPanel"></div>
+        </section>
+
+        <section class="card">
+          <div class="flex-between">
+            <p class="muted" style="font-size:0.85rem">Saving records this check-in to the patient database.</p>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Save check-in</button>
+          </div>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/checkin.js"></script>
+</body>
+</html>

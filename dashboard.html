@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Registry — NoFaceNoCase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="wordmark" href="dashboard.html">NoFace<span>NoCase</span>
+        <small>Patient wellness monitoring</small>
+      </a>
+      <nav class="top-nav" aria-label="Main navigation">
+        <a class="nav-link active" href="dashboard.html">Patient registry</a>
+      </nav>
+      <div class="topbar-user">
+        <div class="who" id="userName"></div>
+        <span id="userRole" class="role-chip"></span>
+        <button class="btn btn-light btn-sm" onclick="logout()">Sign out</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="flex-between">
+        <div>
+          <p class="eyebrow">Ward overview</p>
+          <h1 class="page-title">Patient registry</h1>
+          <p class="page-sub">Search patients, open wellness trends, and record new check-ins.</p>
+        </div>
+        <button class="btn btn-primary" id="addPatientBtn">+ Register patient</button>
+      </div>
+
+      <div class="stat-row" id="statRow">
+        <div class="stat"><div class="num" id="statPatients">–</div><div class="lbl">Patients on ward</div></div>
+        <div class="stat mint"><div class="num" id="statCheckins">–</div><div class="lbl">Check-ins recorded</div></div>
+        <div class="stat alert"><div class="num" id="statAlerts">–</div><div class="lbl">Distress alerts sent</div></div>
+      </div>
+
+      <section class="card mood-none" id="wardMoodCard">
+        <div class="ward-card">
+          <div class="ward-head">
+            <div>
+              <p class="eyebrow" style="margin-bottom:6px">Ward mood right now</p>
+              <span class="ward-dominant" id="wardDominant">Reading the ward…</span>
+            </div>
+          </div>
+          <div class="ward-bar" id="wardBar"></div>
+          <div class="ward-legend" id="wardLegend"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="registry-controls">
+          <div class="rc-search">
+            <label class="field-label" for="searchBox">Search</label>
+            <input type="text" id="searchBox" placeholder="Search by name, patient ID or ward…" />
+          </div>
+          <div class="rc-field">
+            <label class="field-label" for="sortBy">Sort</label>
+            <select id="sortBy">
+              <option value="urgent">Most urgent first</option>
+              <option value="name">Name (A–Z)</option>
+              <option value="id">Patient ID</option>
+            </select>
+          </div>
+          <div class="rc-field">
+            <label class="field-label" for="statusFilter">Status</label>
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="Admitted">Admitted</option>
+              <option value="Observation">Observation</option>
+              <option value="Discharged">Discharged</option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <table class="registry" aria-label="Patient registry">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>ID</th>
+                <th>Age</th>
+                <th>Ward</th>
+                <th>Assigned clinician</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="registryBody">
+              <tr><td colspan="6" class="muted">Loading patients… <span class="spin dark"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add / edit patient modal -->
+  <div class="modal-backdrop hidden" id="patientModal">
+    <section class="card modal">
+      <h2 class="page-title" id="modalTitle" style="font-size:1.3rem">Register patient</h2>
+      <p class="page-sub" id="modalSub" style="margin-bottom:18px">Creates a new record in the patient database.</p>
+      <form id="patientForm" novalidate>
+        <div class="form-grid">
+          <div class="full">
+            <label class="field-label" for="pName">Full name</label>
+            <input type="text" id="pName" required />
+          </div>
+          <div>
+            <label class="field-label" for="pAge">Age</label>
+            <input type="number" id="pAge" min="12" max="110" required />
+          </div>
+          <div>
+            <label class="field-label" for="pWard">Ward</label>
+            <select id="pWard">
+              <option>Ward 2B</option>
+              <option>Ward 3A</option>
+              <option>Ward 4C</option>
+            </select>
+          </div>
+          <div class="full">
+            <label class="field-label" for="pCondition">Primary condition</label>
+            <input type="text" id="pCondition" placeholder="e.g. Generalised anxiety" required />
+          </div>
+          <div>
+            <label class="field-label" for="pClinician">Assigned clinician</label>
+            <select id="pClinician">
+              <option>Dr. Aisha Rahman</option>
+              <option>Dr. Kevin Ong</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="pStatus">Status</label>
+            <select id="pStatus">
+              <option>Admitted</option>
+              <option>Observation</option>
+              <option>Discharged</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex-between mt-24">
+          <button type="button" class="btn btn-ghost" id="modalCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="modalSave">Save patient</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
